@@ -23,9 +23,12 @@ with open('Export.csv', 'r') as f:
 #print(farmers)
 
 zip_code = input('Введите почтовый индекс => ')
-for market in farmers[zip_code]:
-    market_proj = [market[0], market[7], market[9], market[19], market[20]]
-    print(" ".join(market_proj))
+if zip_code in farmers:
+    for market in farmers[zip_code]:
+        market_proj = [market[0], market[7], market[9], market[19], market[20]]
+        print(" ".join(market_proj))
+else:
+    print("There is no such zip code in the bd")
 
 city = input('Введите название города => ')
 state = input('Введите название штата => ')
@@ -36,6 +39,3 @@ for fm_zip in farmers:
         market_proj = [market[0], market[7], market[9], market[19], market[20]]
         if market_proj[1] == city and market_proj[2] == state:
             print(" ".join(market_proj))
-
-print("Hello world")
-    
