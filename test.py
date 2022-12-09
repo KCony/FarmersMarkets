@@ -1,6 +1,6 @@
 
 
-# import model
+import model
 
 testcases_input = []
 testcases_result = []
@@ -8,7 +8,6 @@ testcases_result = []
 count = 0
 passed = 0
 failed = 0
-
 
 for test in testcases_input:
     res = model.find(test)
