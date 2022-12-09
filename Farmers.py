@@ -20,20 +20,21 @@ with open('Export.csv', 'r') as f:
         if data_row[11] not in farmers:
             farmers[data_row[11]] = []
         farmers[data_row[11]].append(data_row[1:])
-print(farmers)
+#print(farmers)
 
 zip_code = input('Введите почтовый индекс => ')
 for market in farmers[zip_code]:
     market_proj = [market[0], market[7], market[9], market[19], market[20]]
     print(" ".join(market_proj))
 
-# city = input('Введите название города => ')
-# state = input('Введите название штата => ')
+city = input('Введите название города => ')
+state = input('Введите название штата => ')
 
-# for fmid in farmers:
-#     market = farmers[fmid]
-#     market_proj = [market[0], market[7], market[9], market[19], market[20]]
-#     if market_proj[1] == city and market_proj[2] == state:
-#         print(" ".join(market_proj))
+
+for fm_zip in farmers:
+    for market in farmers[fm_zip]:
+        market_proj = [market[0], market[7], market[9], market[19], market[20]]
+        if market_proj[1] == city and market_proj[2] == state:
+            print(" ".join(market_proj))
 
     
