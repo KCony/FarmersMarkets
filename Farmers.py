@@ -30,11 +30,11 @@ for market in farmers[zip_code]:
 city = input('Введите название города => ')
 state = input('Введите название штата => ')
 
-
-for fm_zip in farmers:
-    for market in farmers[fm_zip]:
-        market_proj = [market[0], market[7], market[9], market[19], market[20]]
-        if market_proj[1] == city and market_proj[2] == state:
-            print(" ".join(market_proj))
+print("Я доабвил новую ветку")
+    #for fm_zip in farmers:
+        #for market in farmers[fm_zip]:
+            #market_proj = [market[0], market[7], market[9], market[19], market[20]]
+            #if market_proj[1] == city and market_proj[2] == state:
+                #print(" ".join(market_proj))
 
     
