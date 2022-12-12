@@ -8,13 +8,13 @@ import csv
 
 
 data = []
-with open('Data/Export.csv', 'r') as f:      # возможно применить открытие с with sqlite3.connect('server.db') as db
+with open('Data/Export.csv', 'r', encoding="utf-8") as f:
     reader = csv.reader(f)
-    for row in reader:                       # переписываемя данные с CSV файла в переменную data[]
+    for row in reader:                       # переписываемя данные с CSV файла
         data.append(row)
 
 
-db = sqlite3.connect('server.db')            # подключаемся к файлу БД, если его нет - он создается автоматически
+db = sqlite3.connect('server.db')            # подключаемся к файлу БД
 sql = db.cursor()
 # создаем 4 таблицы
 sql.execute("""CREATE TABLE IF NOT EXISTS Markets (
@@ -47,34 +47,34 @@ sql.execute("""CREATE TABLE IF NOT EXISTS MarketsCr (
 
 db.commit()                         # подтверждение выполнения изменений в файле БД
 
-count = 1                           # цикл проходит по переменной data с данныйми из CSV и добовляет данные в 4 таблицы
-for i in data[1:len(data)]:
+cnt = 1                           # цикл проходит по переменной data с данныйми из CSV
+for i in data[1:len(data)]:         # и добовляет данные в 4 таблицы
     sql.execute("INSERT INTO Markets VALUES (null,?,?,?,?,?,?,?,?)",
-                (data[count][1], data[count][7], data[count][8],
-                 data[count][9], data[count][10], data[count][11],
-                 data[count][20], data[count][21]))
+                (data[cnt][1], data[cnt][7], data[cnt][8],
+                 data[cnt][9], data[cnt][10], data[cnt][11],
+                 data[cnt][20], data[cnt][21]))
     sql.execute("INSERT INTO Media VALUES (null,?,?,?,?,?)",
-                (data[count][2], data[count][3], data[count][4],
-                 data[count][5], data[count][6]))
+                (data[cnt][2], data[cnt][3], data[cnt][4],
+                 data[cnt][5], data[cnt][6]))
     sql.execute("INSERT INTO Season VALUES (null,?,?,?,?,?,?,?,?)",
-                (data[count][12], data[count][13], data[count][14],
-                 data[count][15], data[count][16], data[count][17],
-                 data[count][18], data[count][19]))
+                (data[cnt][12], data[cnt][13], data[cnt][14],
+                 data[cnt][15], data[cnt][16], data[cnt][17],
+                 data[cnt][18], data[cnt][19]))
     sql.execute("INSERT INTO MarketsCr VALUES (null,?,?,?,?,?,?,?,?,"
                 "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                (data[count][23], data[count][24], data[count][25],
-                 data[count][26], data[count][27], data[count][28],
-                 data[count][29], data[count][30], data[count][31],
-                 data[count][32], data[count][33], data[count][34],
-                 data[count][35], data[count][36], data[count][37],
-                 data[count][38], data[count][39], data[count][40],
-                 data[count][41], data[count][42], data[count][43],
-                 data[count][44], data[count][45], data[count][46],
-                 data[count][47], data[count][48], data[count][49],
-                 data[count][50], data[count][51], data[count][52],
-                 data[count][53], data[count][54], data[count][55],
-                 data[count][56], data[count][56]))
+                (data[cnt][23], data[cnt][24], data[cnt][25],
+                 data[cnt][26], data[cnt][27], data[cnt][28],
+                 data[cnt][29], data[cnt][30], data[cnt][31],
+                 data[cnt][32], data[cnt][33], data[cnt][34],
+                 data[cnt][35], data[cnt][36], data[cnt][37],
+                 data[cnt][38], data[cnt][39], data[cnt][40],
+                 data[cnt][41], data[cnt][42], data[cnt][43],
+                 data[cnt][44], data[cnt][45], data[cnt][46],
+                 data[cnt][47], data[cnt][48], data[cnt][49],
+                 data[cnt][50], data[cnt][51], data[cnt][52],
+                 data[cnt][53], data[cnt][54], data[cnt][55],
+                 data[cnt][56], data[cnt][56]))
     db.commit()                    # обязательное подтверждение изменений в БД
-    count += 1
+    cnt += 1
 
 db.close()                         # закрытие файла
