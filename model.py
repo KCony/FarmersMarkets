@@ -47,34 +47,34 @@ sql.execute("""CREATE TABLE IF NOT EXISTS MarketsCr (
 
 db.commit()                         # подтверждение выполнения изменений в файле БД
 
-cnt = 1                           # цикл проходит по переменной data с данныйми из CSV
+CNT = 1                           # цикл проходит по переменной data с данныйми из CSV
 for i in data[1:len(data)]:         # и добовляет данные в 4 таблицы
     sql.execute("INSERT INTO Markets VALUES (null,?,?,?,?,?,?,?,?)",
-                (data[cnt][1], data[cnt][7], data[cnt][8],
-                 data[cnt][9], data[cnt][10], data[cnt][11],
-                 data[cnt][20], data[cnt][21]))
+                (data[CNT][1], data[CNT][7], data[CNT][8],
+                 data[CNT][9], data[CNT][10], data[CNT][11],
+                 data[CNT][20], data[CNT][21]))
     sql.execute("INSERT INTO Media VALUES (null,?,?,?,?,?)",
-                (data[cnt][2], data[cnt][3], data[cnt][4],
-                 data[cnt][5], data[cnt][6]))
+                (data[CNT][2], data[CNT][3], data[CNT][4],
+                 data[CNT][5], data[CNT][6]))
     sql.execute("INSERT INTO Season VALUES (null,?,?,?,?,?,?,?,?)",
-                (data[cnt][12], data[cnt][13], data[cnt][14],
-                 data[cnt][15], data[cnt][16], data[cnt][17],
-                 data[cnt][18], data[cnt][19]))
+                (data[CNT][12], data[CNT][13], data[CNT][14],
+                 data[CNT][15], data[CNT][16], data[CNT][17],
+                 data[CNT][18], data[CNT][19]))
     sql.execute("INSERT INTO MarketsCr VALUES (null,?,?,?,?,?,?,?,?,"
                 "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                (data[cnt][23], data[cnt][24], data[cnt][25],
-                 data[cnt][26], data[cnt][27], data[cnt][28],
-                 data[cnt][29], data[cnt][30], data[cnt][31],
-                 data[cnt][32], data[cnt][33], data[cnt][34],
-                 data[cnt][35], data[cnt][36], data[cnt][37],
-                 data[cnt][38], data[cnt][39], data[cnt][40],
-                 data[cnt][41], data[cnt][42], data[cnt][43],
-                 data[cnt][44], data[cnt][45], data[cnt][46],
-                 data[cnt][47], data[cnt][48], data[cnt][49],
-                 data[cnt][50], data[cnt][51], data[cnt][52],
-                 data[cnt][53], data[cnt][54], data[cnt][55],
-                 data[cnt][56], data[cnt][56]))
+                (data[CNT][23], data[CNT][24], data[CNT][25],
+                 data[CNT][26], data[CNT][27], data[CNT][28],
+                 data[CNT][29], data[CNT][30], data[CNT][31],
+                 data[CNT][32], data[CNT][33], data[CNT][34],
+                 data[CNT][35], data[CNT][36], data[CNT][37],
+                 data[CNT][38], data[CNT][39], data[CNT][40],
+                 data[CNT][41], data[CNT][42], data[CNT][43],
+                 data[CNT][44], data[CNT][45], data[CNT][46],
+                 data[CNT][47], data[CNT][48], data[CNT][49],
+                 data[CNT][50], data[CNT][51], data[CNT][52],
+                 data[CNT][53], data[CNT][54], data[CNT][55],
+                 data[CNT][56], data[CNT][56]))
     db.commit()                    # обязательное подтверждение изменений в БД
-    cnt += 1
+    CNT += 1
 
 db.close()                         # закрытие файла
