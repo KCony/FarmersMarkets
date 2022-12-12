@@ -8,7 +8,7 @@ import sqlite3
 
 def all_markets():
     """select all markets"""
-    with sqlite3.connect('server.d_b') as d_b:
+    with sqlite3.connect('server.db') as d_b:
         d_b.row_factory = sqlite3.Row
         sql = d_b.cursor()
 
@@ -20,7 +20,7 @@ def all_markets():
 
 def all_cities():
     """select all city"""
-    with sqlite3.connect('server.d_b') as d_b:
+    with sqlite3.connect('server.db') as d_b:
         d_b.row_factory = sqlite3.Row
         sql = d_b.cursor()
 
@@ -35,10 +35,13 @@ def main():
     while True:
         request = input(">>> ")
         if request == "list":
-            return all_markets()
+            all_markets()
+            print("Next requestt (list, list city ASC, stop):")
         if request == "list city ASC":
-            return all_cities()
-        else:
-            print("no such command, try again ")
+            all_cities()
+            print("Next requestt (list, list city ASC, stop):")
+        if request == "stop":
+            break
+
 
 # main()
