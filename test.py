@@ -38,10 +38,7 @@ def main():
             return all_markets()
         if request == "list city ASC":
             return all_cities()
-        if request == "stop":
-            break
         else:
             print("no such command, try again ")
-
 
 # main()
