@@ -9,7 +9,7 @@ import csv
 
 data = []
 with open('Data/Export.csv', 'r', encoding="utf-8") as f:
-    reader = csv.reader(f)
+    reader = csv.reader(f, skipinitialspace=True)
     for row in reader:                       # переписываемя данные с CSV файла
         data.append(row)
 
