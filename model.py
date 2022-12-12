@@ -1,62 +1,67 @@
 """
-pylint на строку докуемнтации ругается?
+Import data from csv in db
 
-09.12.2022
+12.12.2022
 """
 import sqlite3
 import csv
 
 
 data = []
-with open('Data\Export.csv', 'r') as f:
-    y = csv.reader(f)
-    for row in y:
+with open('Data/Export.csv', 'r') as f:      # возможно применить открытие с with sqlite3.connect('server.db') as db
+    reader = csv.reader(f)
+    for row in reader:                       # переписываемя данные с CSV файла в переменную data[]
         data.append(row)
 
 
-db = sqlite3.connect('server.db')
+db = sqlite3.connect('server.db')            # подключаемся к файлу БД, если его нет - он создается автоматически
 sql = db.cursor()
-
+# создаем 4 таблицы
 sql.execute("""CREATE TABLE IF NOT EXISTS Markets (
-    MarketName TEXT, street TEXT, city TEXT, county TEXT,
-    state TEXT, zip INT, locX FLOAT, locY FLOAT)""")
+    IDMarket INTEGER PRIMARY KEY AUTOINCREMENT, MarketName TEXT, 
+    street TEXT, city TEXT, county TEXT,
+    state TEXT, zip INTEGER, locX FLOAT, locY FLOAT)""")
 
 sql.execute("""CREATE TABLE IF NOT EXISTS Media (
+    IDMarket INTEGER PRIMARY KEY AUTOINCREMENT,
     Website TEXT, Facebook TEXT, Twitter TEXT,
     Youtube TEXT, OtherMedia TEXT)""")
 
 sql.execute("""CREATE TABLE IF NOT EXISTS Season (
+    IDMarket INTEGER PRIMARY KEY AUTOINCREMENT,
     Season1Date TEXT, Season1Time TEXT, Season2Date TEXT, Season2Time TEXT,
     Season3Date TEXT, Season3Time TEXT, Season4Date TEXT, Season4Time TEXT)""")
 
 sql.execute("""CREATE TABLE IF NOT EXISTS MarketsCr (
+    IDMarket INTEGER PRIMARY KEY AUTOINCREMENT,
     Credit TEXT, WIC TEXT, WICcash TEXT, SFMNP TEXT,
     SNAP TEXT, Organic TEXT, Bakedgoods TEXT, Cheese TEXT, 
     Crafts TEXT, Flowers TEXT, Eggs TEXT, Seafood TEXT,
     Herbs TEXT, Vegetables TEXT, Honey TEXT, Jams TEXT, 
     Maple TEXT, Meat TEXT, Nursery TEXT,
-    Nuts TEXT, Plants TEXT, Poultry TEXT, Prepared TEXT
+    Nuts TEXT, Plants TEXT, Poultry TEXT, Prepared TEXT,
     Soap TEXT, Trees TEXT, Wine TEXT, Coffee TEXT, 
     Beans TEXT, Fruits TEXT, Grains TEXT,
     Juices TEXT, Mushrooms TEXT, PetFood TEXT, Tofu TEXT,
     WildHarvested TEXT)""")
 
-db.commit()
+db.commit()                         # подтверждение выполнения изменений в файле БД
 
-count = 1
+count = 1                           # цикл проходит по переменной data с данныйми из CSV и добовляет данные в 4 таблицы
 for i in data[1:len(data)]:
-    sql.execute("INSERT INTO Markets VALUES (?,?,?,?,?,?,?,?)",
+    sql.execute("INSERT INTO Markets VALUES (null,?,?,?,?,?,?,?,?)",
                 (data[count][1], data[count][7], data[count][8],
                  data[count][9], data[count][10], data[count][11],
                  data[count][20], data[count][21]))
-    sql.execute("INSERT INTO Media VALUES (?,?,?,?,?)",
+    sql.execute("INSERT INTO Media VALUES (null,?,?,?,?,?)",
                 (data[count][2], data[count][3], data[count][4],
                  data[count][5], data[count][6]))
-    sql.execute("INSERT INTO Season VALUES (?,?,?,?,?,?,?,?)",
+    sql.execute("INSERT INTO Season VALUES (null,?,?,?,?,?,?,?,?)",
                 (data[count][12], data[count][13], data[count][14],
                  data[count][15], data[count][16], data[count][17],
                  data[count][18], data[count][19]))
-    sql.execute("INSERT INTO MarketsCr VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    sql.execute("INSERT INTO MarketsCr VALUES (null,?,?,?,?,?,?,?,?,"
+                "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (data[count][23], data[count][24], data[count][25],
                  data[count][26], data[count][27], data[count][28],
                  data[count][29], data[count][30], data[count][31],
@@ -68,8 +73,8 @@ for i in data[1:len(data)]:
                  data[count][47], data[count][48], data[count][49],
                  data[count][50], data[count][51], data[count][52],
                  data[count][53], data[count][54], data[count][55],
-                 data[count][56]))
-    db.commit()
+                 data[count][56], data[count][56]))
+    db.commit()                    # обязательное подтверждение изменений в БД
     count += 1
 
-db.close()
+db.close()                         # закрытие файла
