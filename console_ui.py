@@ -4,3 +4,6 @@ def print_ui(cmd, res):
         print('The list of market names')
         for val in res:
             print(val)
+
+def get_command_prompt():
+    return 'Input your command => '
