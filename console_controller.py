@@ -45,3 +45,11 @@ def execute_command(cmd_line):  # функция выполнения коман
  #  if cmd_line[0] = 'detail':
  #  model.find(cmd[1], cmd[2])    # Здесь взаимодействуем с MODEL
 print("Выполнение ф-ции execute_command")
+
+
+def repl():
+    pass
+
+
+if __name__ == '__main__':
+    repl()
