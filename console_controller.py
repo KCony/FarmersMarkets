@@ -60,8 +60,8 @@ def execute_command(cmd_line, db_conn, db_curs):  # функция выполн�
 def repl(db_conn, db_curs):
     command = ''
     while (command != 'end'):
-
-        command = input('Input your command => ')
+        prompt = console_ui.get_command_prompt()
+        command = input(prompt)
         processed_command = process_command(command)
         execute_command(processed_command, db_conn, db_curs)
 
