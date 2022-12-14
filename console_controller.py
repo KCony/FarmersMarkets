@@ -7,7 +7,7 @@ import console_ui
 # Блок Console_Controller отвечает за взаимодействие с пользователем из командной строки — пункт 6 Задания№6
 # Здесь будет цикл команд на ввод от пользователя и отправка в блок отображения View в виде REPL:
 # -Read; -Evaluate; - Print; -Loop
-print("Ниже - описание функциональности из задания!")
+# print("Ниже - описание функциональности из задания!")
 """
 Будет реализовываться следующая функциональность:
 list - Просматривать список всех фермерских рынков в стране (включая рецензии и рейтинги) (с разбивкой по страницам - потом);
@@ -64,7 +64,6 @@ def repl(db_conn, db_curs):
         command = input(prompt)
         processed_command = process_command(command)
         execute_command(processed_command, db_conn, db_curs)
-
 
 
 if __name__ == '__main__':
