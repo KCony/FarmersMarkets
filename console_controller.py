@@ -46,7 +46,10 @@ def execute_command(cmd_line, db_conn, db_curs):  # функция выполн�
 
     if cmd_line == 'list':
         result = model.list_markets(db_curs)
-        console_ui.print_ui(cmd_line, result)
+    elif cmd_line == 'list cities':
+        result = model.all_cities(db_curs)
+
+    console_ui.print_ui(cmd_line, result)
 
 
  # if cmd_line[0] is None:  # Передали пустую команду
