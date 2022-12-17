@@ -280,7 +280,7 @@ def insert_state():
 
 def init():
     """init"""
-    db_conn = sqlite3.connect('server.db')
+    db_conn = sqlite3.connect('server2.db')
     db_curs = db_conn.cursor()
     return db_conn, db_curs
 
@@ -294,7 +294,7 @@ def close(db_conn, db_curs):
 def list_markets(db_curs):
     """select all name of market"""
     markets_list = []
-    db_curs.execute("SELECT MarketName FROM Markets")
+    db_curs.execute("SELECT Name FROM Markets")
 
     for result in db_curs:
         markets_list.append(result[0])
@@ -304,12 +304,33 @@ def list_markets(db_curs):
 def all_cities(db_curs):
     """select all cities"""
     cities_list = []
-    db_curs.execute("SELECT city FROM Markets ORDER BY city")
-
+    db_curs.execute("SELECT city FROM Cities ORDER BY city")
     for result in db_curs:
         cities_list.append(result[0])
     return cities_list
 
+
+def find_by_zip(db_curs, zip_code):
+    """searching name of Market by ZIP code"""
+    db_curs.execute("""SELECT Name, comments, rating FROM Markets WHERE 
+    ID = (SELECT idMarket FROM Addresses WHERE ZIP = ?)""", (zip_code, ))
+    name_by_zip = db_curs.fetchone()
+    return name_by_zip
+
+def find_by_city(db_curs, city, state):
+    """searching name of Market by city and state"""
+    xc = []
+    db_curs.execute("""SELECT idMarket FROM Addresses WHERE City = 
+    (SELECT ID FROM Cities WHERE City = ?) AND State = 
+    (SELECT ID FROM States WHERE State = ?)""", (city, state))
+    for result in db_curs:
+        xc.append(result)
+    list_by = []
+    for i in xc:
+        db_curs.execute("""SELECT Name, comments, rating FROM Markets WHERE ID = ? """, i)
+        list_by.append(db_curs.fetchone())
+
+    return list_by
 
 if __name__ == '__main__':
     tm.run_all_tests()
