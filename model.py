@@ -7,7 +7,7 @@ import sqlite3
 import csv
 import tests_model as tm
 
-
+# BLOCK #1 ETL
 def create_table():
     """Creating table"""
     db_conn = sqlite3.connect('server2.db')
@@ -277,7 +277,7 @@ def insert_state():
     db_curs.close()
     db_conn.close()
 
-
+# BLOCK #1 Model
 def init():
     """init"""
     db_conn = sqlite3.connect('server2.db')
@@ -331,6 +331,32 @@ def find_by_city(db_curs, city, state):
         list_by.append(db_curs.fetchone())
 
     return list_by
+
+def detailed_data(db_curs, name_market):
+    """shows details about Market"""
+    found_id = []
+    db_curs.execute("""SELECT ID FROM Markets WHERE Name = ? """, (name_market, ))
+    for result in db_curs:
+        found_id.append(result)
+    found_street = []
+    for i in found_id:
+        db_curs.execute(f"""SELECT City FROM Addresses WHERE idMarket = {i[0]}""")
+        city = db_curs.fetchone()
+        db_curs.execute(f"""SELECT State FROM Addresses WHERE idMarket = {i[0]}""")
+        state = db_curs.fetchone()
+        db_curs.execute(f"""SELECT County FROM Addresses WHERE idMarket = {i[0]}""")
+        county = db_curs.fetchone()
+        db_curs.execute(f"""SELECT addresses.*, cities.city, states.state, counties.county, media.*
+        FROM Addresses, Cities, states, counties, media
+        WHERE addresses.idmarket = {i[0]} and cities.id = {city[0]} AND states.id = {state[0]}
+        AND counties.id = {county[0]} AND media.idMarket = {i[0]}""")
+        found_street.append(db_curs.fetchone())
+
+
+    return found_street
+
+
+
 
 if __name__ == '__main__':
     tm.run_all_tests()

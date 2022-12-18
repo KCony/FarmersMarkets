@@ -50,9 +50,9 @@ def name_by_zip(db_curs, zip_code):
 
 
 def name_by_city(db_curs, city, state):
-    x = model.find_by_city(db_curs, city, state)
+    found_market = model.find_by_city(db_curs, city, state)
     print('found markets: ')
-    for i in x:
+    for i in found_market:
         cnt = 0
         for j in i:
             if cnt == 0:
@@ -63,7 +63,14 @@ def name_by_city(db_curs, city, state):
                 print(f'rating of market ==> {j}')
             cnt += 1
 
-model.close(conn, curs)
+
+def details(db_curs, name):
+    found_market = model.detailed_data(db_curs, name)
+    for i in found_market:
+        print(i)
+
+details(curs, "29 Palms Farmers' Market")
+# model.close(conn, curs)
 
 
 # name_by_city(curs, 'Akron', 'Ohio')
