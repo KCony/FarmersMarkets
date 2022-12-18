@@ -99,6 +99,8 @@ def list_markets(db_curs, cmd_line):
 
 def find_market(db_curs, Market_name):
 #  Ищем рынок по названию. Рынков с одним названием может быть несколько?
+#  Market_name - это на самом деле команда, которая передает аргумент для поиска, т.е. название рынка
+#  find_market должна возвращать список найденных FMID.
     found_markets_list = []
     db_curs.execute("SELECT MarketName FROM Markets")
     for m_Name in db_curs:
