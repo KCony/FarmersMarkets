@@ -5,7 +5,7 @@ Import data from csv in db
 """
 import sqlite3
 import csv
-import tests_model as tm
+import tests.tests_model as tm
 
 
 def etl():
@@ -89,7 +89,7 @@ def close(db_conn, db_curs):
 
 
 def list_markets(db_curs, cmd_line):
-# Пока реализуется функция — показать список всех рынков. Потом параметры будут передаваться через список - cmd_line
+    # Пока реализуется функция — показать список всех рынков. Потом параметры будут передаваться через список - cmd_line
     markets_list = []
     db_curs.execute("SELECT MarketName FROM Markets")
 
@@ -97,13 +97,15 @@ def list_markets(db_curs, cmd_line):
         markets_list.append(result[0])
     return markets_list
 
-def find_market(db_curs, Market_name):
-#  Ищем рынок по названию. Рынков с одним названием может быть несколько?
+
+def find_market(db_curs, market_name):
+    #  Ищем рынок по названию. Рынков с одним названием может быть несколько?
     found_markets_list = []
     db_curs.execute("SELECT MarketName FROM Markets")
     for m_Name in db_curs:
         found_markets_list.append(m_Name)  # Добавляем рынок в список найденных
     return found_markets_list
+
 
 def all_cities(db_curs):
     cities_list = []
