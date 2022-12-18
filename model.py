@@ -117,11 +117,18 @@ def create_table():
 
 def insert_from_csv():
     """filling tables with data"""
-    data = []
+    data2 = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
         for row in reader:
-            data.append(row)
+            data2.append(row)
+
+    data = []
+    for i in data2:
+        x = []
+        for j in i:
+            x.append(j.strip())
+        data.append(x)
 
     db_conn = sqlite3.connect('server2.db')
     db_curs = db_conn.cursor()
@@ -142,33 +149,43 @@ def insert_from_csv():
         db_conn.commit()
         cnt += 1
 
-    city = []
+    cityskip = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
         for row in reader:
-            city.append(row[8])
+            cityskip.append(row[8])
+    city = []
+    for i in cityskip:
+        city.append(i.strip())
+
     city_uniq = set(city)
 
     for city in city_uniq:
         db_curs.execute("INSERT INTO Cities VALUES (null,?)", (city,))
         db_conn.commit()
 
-    county = []
+    countyskip = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
         for row in reader:
-            county.append(row[9])
+            countyskip.append(row[9])
+    county = []
+    for i in countyskip:
+        county.append(i.strip())
     county_uniq = set(county)
 
     for county in county_uniq:
         db_curs.execute("INSERT INTO Counties VALUES (null,?)", (county,))
         db_conn.commit()
 
-    state = []
+    stateskip = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
         for row in reader:
-            state.append(row[10])
+            stateskip.append(row[10])
+    state = []
+    for i in stateskip:
+        state.append(i.strip())
     state_uniq = set(state)
 
     for state in state_uniq:
@@ -190,11 +207,14 @@ def insert_city():
     for i in x:
         city_list.append(i)
 
-    city = []
+    cityskip = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
         for row in reader:
-            city.append(row[8])
+            cityskip.append(row[8])
+    city = []
+    for i in cityskip:
+        city.append(i.strip())
 
     in_table = []
     for i in city[1:]:
@@ -223,11 +243,14 @@ def insert_county():
     for i in x:
         county_list.append(i)
 
-    county = []
+    countyskip = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
         for row in reader:
-            county.append(row[9])
+            countyskip.append(row[9])
+    county = []
+    for i in countyskip:
+        county.append(i.strip())
 
     in_table = []
     for i in county[1:]:
@@ -256,11 +279,14 @@ def insert_state():
     for i in x:
         state_list.append(i)
 
-    state = []
+    stateskip = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
         for row in reader:
-            state.append(row[10])
+            stateskip.append(row[10])
+    state = []
+    for i in stateskip:
+        state.append(i.strip())
 
     in_table = []
     for i in state[1:]:
@@ -277,7 +303,7 @@ def insert_state():
     db_curs.close()
     db_conn.close()
 
-# BLOCK #1 Model
+# BLOCK #2 Model
 def init():
     """init"""
     db_conn = sqlite3.connect('server2.db')
@@ -354,8 +380,6 @@ def detailed_data(db_curs, name_market):
 
 
     return found_street
-
-
 
 
 if __name__ == '__main__':

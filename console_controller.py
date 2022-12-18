@@ -3,6 +3,7 @@ from math import radians, cos, sin, asin, sqrt
 
 
 conn, curs = model.init()
+
 def list_market():
     all_name = model.list_markets(curs)
     for i in all_name:
@@ -69,11 +70,13 @@ def details(db_curs, name):
     for i in found_market:
         print(i)
 
-details(curs, "29 Palms Farmers' Market")
-# model.close(conn, curs)
 
+# ПРИМЕРЫ КОМАНД НИЖЕ
 
-# name_by_city(curs, 'Akron', 'Ohio')
 # list_market()
 # list_city()
-# name_by_zip(curs, 69361)
+# details(curs, "HAPI Fresh Farmers' Market ")
+# name_by_city(curs, 'Akron', 'Ohio')
+# name_by_zip(curs, 5828)
+
+model.close(conn, curs)
