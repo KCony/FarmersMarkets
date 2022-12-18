@@ -1,16 +1,14 @@
-"""Тест для модуля console_controller.py."""
+"""Тест для модуля console_ui.py."""
 
-from console_controller import *
+import unittest
 
-passed = 0
-
-
-def run_all_tests():
-    """Запуск тестов."""
-    test1()
-    print(f"{passed} tests passed out of 2")
+from console_ui import *
 
 
-def test1():
-    """Тест на ..."""
+class TestGetCommandPrompt(unittest.TestCase):
+    """Тест для функции get_command_prompt."""
 
+    def test_get_command_prompt(self):
+        """Тест для функции get_command_prompt."""
+        console = get_command_prompt()
+        self.assertEqual(console, 'Input your command => ')
