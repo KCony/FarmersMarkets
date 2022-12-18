@@ -5,12 +5,12 @@ DATA BASE SQLite3
 """
 import sqlite3
 import csv
-import tests_model as tm
+
 
 # BLOCK #1 ETL
-def create_table():
+def create_table(file_name):
     """Creating table"""
-    db_conn = sqlite3.connect('server2.db')
+    db_conn = sqlite3.connect(file_name)
     db_curs = db_conn.cursor()
 
     db_curs.execute("""CREATE TABLE IF NOT EXISTS `Markets` (
@@ -115,7 +115,7 @@ def create_table():
     db_conn.close()
 
 
-def insert_from_csv():
+def insert_from_csv(file_name):
     """filling tables with data"""
     data2 = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
@@ -130,7 +130,7 @@ def insert_from_csv():
             x.append(j.strip())
         data.append(x)
 
-    db_conn = sqlite3.connect('server2.db')
+    db_conn = sqlite3.connect(file_name)
     db_curs = db_conn.cursor()
 
     cnt = 1
@@ -196,9 +196,9 @@ def insert_from_csv():
     db_conn.close()
 
 
-def insert_city():
+def insert_city(file_name):
     """unique cities"""
-    db_conn = sqlite3.connect('server2.db')
+    db_conn = sqlite3.connect(file_name)
     db_curs = db_conn.cursor()
 
     db_curs.execute("""SELECT * FROM Cities""")
@@ -232,9 +232,9 @@ def insert_city():
     db_conn.close()
 
 
-def insert_county():
+def insert_county(file_name):
     """unique counties"""
-    db_conn = sqlite3.connect('server2.db')
+    db_conn = sqlite3.connect(file_name)
     db_curs = db_conn.cursor()
 
     db_curs.execute("""SELECT * FROM Counties""")
@@ -268,9 +268,9 @@ def insert_county():
     db_conn.close()
 
 
-def insert_state():
+def insert_state(file_name):
     """unique states"""
-    db_conn = sqlite3.connect('server2.db')
+    db_conn = sqlite3.connect(file_name)
     db_curs = db_conn.cursor()
 
     db_curs.execute("""SELECT * FROM States""")
@@ -303,10 +303,11 @@ def insert_state():
     db_curs.close()
     db_conn.close()
 
+
 # BLOCK #2 Model
-def init():
+def init(file_name):
     """init"""
-    db_conn = sqlite3.connect('server2.db')
+    db_conn = sqlite3.connect(file_name)
     db_curs = db_conn.cursor()
     return db_conn, db_curs
 
@@ -317,7 +318,7 @@ def close(db_conn, db_curs):
     db_conn.close()
 
 
-def list_markets(db_curs):
+def list_markets(db_curs, cmd_line):
     """select all name of market"""
     markets_list = []
     db_curs.execute("SELECT Name FROM Markets")
@@ -336,12 +337,24 @@ def all_cities(db_curs):
     return cities_list
 
 
+def find_market(db_curs, market_name):
+    #  Ищем рынок по названию. Рынков с одним названием может быть несколько?
+    #  Market_name - это на самом деле команда, которая передает аргумент для поиска, т.е. название рынка
+    #  find_market должна возвращать список найденных FMID.
+    found_markets_list = []
+    db_curs.execute("SELECT MarketName FROM Markets")
+    for m_Name in db_curs:
+        found_markets_list.append(m_Name)  # Добавляем рынок в список найденных
+    return found_markets_list
+
+
 def find_by_zip(db_curs, zip_code):
     """searching name of Market by ZIP code"""
     db_curs.execute("""SELECT Name, comments, rating FROM Markets WHERE 
     ID = (SELECT idMarket FROM Addresses WHERE ZIP = ?)""", (zip_code, ))
     name_by_zip = db_curs.fetchone()
     return name_by_zip
+
 
 def find_by_city(db_curs, city, state):
     """searching name of Market by city and state"""
@@ -357,6 +370,7 @@ def find_by_city(db_curs, city, state):
         list_by.append(db_curs.fetchone())
 
     return list_by
+
 
 def detailed_data(db_curs, name_market):
     """shows details about Market"""
@@ -378,9 +392,4 @@ def detailed_data(db_curs, name_market):
         AND counties.id = {county[0]} AND media.idMarket = {i[0]}""")
         found_street.append(db_curs.fetchone())
 
-
     return found_street
-
-
-if __name__ == '__main__':
-    tm.run_all_tests()

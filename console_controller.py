@@ -1,11 +1,94 @@
-import model
+"""Модуль взаимодействия с пользователем."""
+
 from math import radians, cos, sin, asin, sqrt
 
+import console_ui
+import model
 
-conn, curs = model.init()
+conn, curs = model.init('server2.db')
+cmd_list = {'list', 'find', 'details', 'show', 'write', 'end'}  # Список доступных команд, оформленный кортежем
+cmd_line = []   # Список из 3-х аргументов, передаваемых в командах list', 'find', 'show', 'write'
+
+"""
+Будет реализовываться следующая функциональность:
+list - Просматривать список всех фермерских рынков в стране (включая рецензии и рейтинги) (с разбивкой по страницам - потом);
+find - Осуществлять поиск фермерского рынка по городу и штату, а также по почтовому индексу с возможностью ограничить
+  зону поиска определенной дальностью (например, на удалении не более 30 миль);
+- Переходить от результатов поиска к просмотру подробных данных о любом рынке, присутствующем в поисковой выдаче;
+- Просматривать и оставлять рецензии на любой фермерский рынок, состоящие из необязательного текста рецензии
+  и обязательного рейтинга (от 1 до 5 звезд);
+- Создавать рецензии, привязанные к имени и фамилии пользователя;
+- Распределять рынки по различным критериям (рейтингу, городу и штату, удаленности от определенной точки и т.п.)
+  от минимального к максимальному значению или наоборот;
+- Удалять требуемые записи и выходить из программы.
+"""
+# Предлагаемый список команд от пользователя:
+# list              - выводит все рынки в стране
+# list city ASC     - выводит города в алфавитном порядке по возрастанию
+# find              - поиск рынков по критериям. Критерии(аргументы) вводятся после команды find
+# find              - Troy New York
+# find              - 12180 -> FMID - посмотреть details
+# details            - подробная информация об одном рынке
+# show review FMID  - показать отзывы о рынке по номеру/индексу
+# write review FMID - написать отзыв
+# end   - заканчивает цикл взаимодействия с пользователем и передает всю полученную инф-цию в модуль View
+
+
+def process_command(line2cmd):  # функция валидации команды, передающейся через аргумент line2cmd - от пользователя
+    #  list, find, т.к. они могут передаваться с дополнительными аргументами, поэтому здесь делаем доп. запрос пользователю
+    #  Поэтому сначала проверяем — это команды с доп.аргументами или без.
+    #  Результатом функции будем возвращать список с 3-мя аргументами p_command_list.
+    #  Список для передачи в качестве результата обработки.
+    p_command_list = []
+    p_command_list.append(line2cmd)
+
+    if line2cmd == 'list':
+        # Для проверки добавляем аргумент в команду find. Надо добавить блок запроса/обработки аргументов.
+        p_command_list.append('city')
+        p_command_list.append('ASC')
+
+    if line2cmd == 'find':
+        # Для проверки добавляем аргумент в команду find. Надо добавить блок запроса/обработки аргументов.
+        prompt = console_ui.get_arguments_prompt(line2cmd)  # Отображаем командную строку для ввода аргументов
+        cmd = input(prompt)  # Получаем команду - command
+        # p_command_list.append('Troy')
+
+    if line2cmd == 'details': pass  # Пока заглушки
+    if line2cmd == 'show': pass  # Пока заглушки — показать
+    if line2cmd == 'write': pass  # Пока заглушки
+
+    return p_command_list  #
+
+
+def execute_command(c_line, db_conn, db_curs):  # функция выполнения команды - c_line
+    # db_conn - подключение к БД (Создаем соединение с нашей базой данных)
+    # db_curs - Создаем курсор — это специальный объект который делает запросы и получает их результаты
+    # c_line - список из 3-х аргументов -> 1.Команда, 2. Аргумент, 3. Критерий для аргумента.
+    # Примеры cmd_line - list city ASC, show review FMID, write review FMID
+
+    if c_line[0] == 'list':
+        result = model.list_markets(db_curs, c_line)  # Лезем в БД за списком всех рынков в одном объекте - result
+        console_ui.print_ui(c_line, result)   # Здесь обращаемся к модулю console_ui (команда VIEW) для отображения
+    if c_line[0] == 'find':
+        result = model.find_market(db_curs, c_line)  # Лезем в БД за списком всех рынков в одном объекте - result
+        console_ui.print_ui(c_line, result)  # Здесь обращаемся к модулю console_ui (команда VIEW) для отображения
+
+
+def repl(db_conn, db_curs):
+    command = ''
+    while command != 'end':
+        prompt = console_ui.get_command_prompt()  # Отображаем командную строку
+        command = input(prompt)   # Получаем команду - command
+        # Обработка команды — нужно описать каждую команду списком/словарем
+        if command in cmd_list:  # Здесь надо добавить обработку ошибок/исключений TRY...
+            processed_command = process_command(command)
+            execute_command(processed_command, db_conn, db_curs)
+        else:
+            console_ui.print_ui(command, cmd_list)   # Печатаем команду и список доступных команд
+
 
 def list_market():
-    all_name = model.list_markets(curs)
+    all_name = model.list_markets(curs, [])
     for i in all_name:
         print(i)
 
@@ -80,3 +163,9 @@ def details(db_curs, name):
 # name_by_zip(curs, 5828)
 
 model.close(conn, curs)
+
+
+if __name__ == '__main__':
+    db_conn, db_curs = model.init('server2.db')
+    repl(db_conn, db_curs)  # Запускаем цикл обращения к БД, пока пользователь не ввел команду 'end'
+    model.close(db_conn, db_curs)  # Закрываем БД
