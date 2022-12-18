@@ -12,9 +12,9 @@ def etl():
     data = []
     with open('Data/Export.csv', 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
-        for row in reader:  # переписываемя данные с CSV файла
+        for row in reader:  # переписываем данные с CSV файла
             data.append(row)
-    db_conn, db_curs= init()
+    db_conn, db_curs = init()
     # создаем 4 таблицы
     db_curs.execute("""CREATE TABLE IF NOT EXISTS Markets (
         IDMarket INTEGER PRIMARY KEY AUTOINCREMENT, MarketName TEXT, 
@@ -46,8 +46,8 @@ def etl():
 
     db_conn.commit()                         # подтверждение выполнения изменений в файле БД
 
-    CNT = 1                           # цикл проходит по переменной data с данныйми из CSV
-    for i in data[1:len(data)]:         # и добовляет данные в 4 таблицы
+    CNT = 1                           # цикл проходит по переменной data с данными из CSV
+    for i in data[1:len(data)]:         # и добавляет данные в 4 таблицы
         db_curs.execute("INSERT INTO Markets VALUES (null,?,?,?,?,?,?,?,?)",
                     (data[CNT][1], data[CNT][7], data[CNT][8],
                      data[CNT][9], data[CNT][10], data[CNT][11],
@@ -88,7 +88,8 @@ def close(db_conn, db_curs):
     db_conn.close()                         # закрытие файла
 
 
-def list_markets(db_curs):
+def list_markets(db_curs, cmd_line):
+# Пока реализуется функция — показать список всех рынков. Потом параметры будут передаваться через список - cmd_line
     markets_list = []
     db_curs.execute("SELECT MarketName FROM Markets")
 
@@ -96,6 +97,13 @@ def list_markets(db_curs):
         markets_list.append(result[0])
     return markets_list
 
+def find_market(db_curs, Market_name):
+#  Ищем рынок по названию. Рынков с одним названием может быть несколько?
+    found_markets_list = []
+    db_curs.execute("SELECT MarketName FROM Markets")
+    for m_Name in db_curs:
+        found_markets_list.append(m_Name)  # Добавляем рынок в список найденных
+    return found_markets_list
 
 def all_cities(db_curs):
     cities_list = []

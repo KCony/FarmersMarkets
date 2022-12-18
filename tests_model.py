@@ -27,4 +27,3 @@ def test2():
         passed += 1
 
     close(db_conn, db_curs)
-
