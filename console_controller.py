@@ -9,7 +9,7 @@ import console_ui
 
 cmd_list = ('list', 'find', 'details', 'show', 'write', 'delete', 'end')  # Список доступных команд, оформленный кортежем
 cmd_list = sorted(cmd_list)
-# cmd_line = []   # Список из 3-х аргументов, передаваемых в командах list', 'find', 'show', 'write'
+
 
 """
 Будет реализовываться следующая функциональность:
@@ -35,7 +35,7 @@ delete - Удалять требуемые записи и выходить из
 # write review FMID - написать отзыв
 # end   - заканчивает цикл взаимодействия с пользователем и передает всю полученную инф-цию в модуль View
 
-def get_find_command_arg(arg_case):  # Определяем значение аргумента к команде find.
+def get_find_command_arg(arg_case):  # Определяем значение 1-го аргумента к команде find.
   if arg_case == 1: return 'State'
   if arg_case == 2: return 'City'
   if arg_case == 3: return 'ZIP'
@@ -79,10 +79,11 @@ def process_command(line2cmd):  # функция валидации команд
     while cmd_arg is None:
       prompt = console_ui.get_arguments_prompt(line2cmd + '-> ' + p_command_list[1])
       p_command_list[2] = input(prompt)  # Получаем значение выбранного аргумента
-      if (p_command_list[1] != 'State') and (p_command_list[1] != 'City'):  #  Для аргументов 3 - 5
+      if (p_command_list[1] == 'State') or (p_command_list[1] == 'City'): cmd_arg = 1
+      else:  #  Для аргументов 3 - 5
         # Если аргументы - не строковые - запускаем проверку на числа
-          try: cmd_arg = int(p_command_list[2])
-          except: cmd_arg = None  # Если не число - цикл ввода повторяется
+        try: cmd_arg = int(p_command_list[2])
+        except: cmd_arg = None  # Если не число - цикл ввода повторяется
 
   if line2cmd == 'details': pass  # Пока заглушки
   if line2cmd == 'show': pass  # Пока заглушки — показать
