@@ -5,7 +5,6 @@ Import data from csv in db
 """
 import sqlite3
 import csv
-import tests.tests_model as tm
 
 
 def etl():
@@ -77,8 +76,8 @@ def etl():
         CNT += 1
 
 
-def init():
-    db_conn = sqlite3.connect('server.db')  # подключаемся к файлу БД
+def init(file_name):
+    db_conn = sqlite3.connect(file_name)  # подключаемся к файлу БД
     db_curs = db_conn.cursor()
     return db_conn, db_curs
 
@@ -114,7 +113,3 @@ def all_cities(db_curs):
     for result in db_curs:
         cities_list.append(result[0])
     return cities_list
-
-
-if __name__ == '__main__':
-    tm.run_all_tests()

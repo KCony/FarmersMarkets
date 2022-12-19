@@ -82,6 +82,6 @@ def repl(db_conn, db_curs):
 
 
 if __name__ == '__main__':
-    db_conn, db_curs = model.init()
+    db_conn, db_curs = model.init('server.db')
     repl(db_conn, db_curs)  # Запускаем цикл обращения к БД, пока пользователь не ввел команду 'end'
     model.close(db_conn, db_curs)  # Закрываем БД
