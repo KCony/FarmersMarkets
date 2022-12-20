@@ -8,6 +8,8 @@ def print_ui(cmd, res):
         for val in res: print(val)
     if (len(cmd) > 1) and (cmd[0] == 'find'):  # find передается список и команда требует дополнительных аргументов
         print("Command: ", cmd)
+    if (len(cmd) > 1) and (cmd[0] == 'list'):  # find передается список и команда требует дополнительных аргументов
+        print("Command: ", cmd)
 
 
 def get_command_prompt():
