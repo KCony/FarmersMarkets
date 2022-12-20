@@ -158,14 +158,14 @@ def details(db_curs, name):
 
 # list_market()
 # list_city()
-# details(curs, "HAPI Fresh Farmers' Market ")
-# name_by_city(curs, 'Akron', 'Ohio')
+# details(curs, "HAPI Fresh Farmers' Market")
+name_by_city(curs, 'Akron', 'Ohio')
 # name_by_zip(curs, 5828)
 
 model.close(conn, curs)
 
 
-if __name__ == '__main__':
-    db_conn, db_curs = model.init('server2.db')
-    repl(db_conn, db_curs)  # Запускаем цикл обращения к БД, пока пользователь не ввел команду 'end'
-    model.close(db_conn, db_curs)  # Закрываем БД
+# if __name__ == '__main__':
+#     db_conn, db_curs = model.init('server2.db')
+#     repl(db_conn, db_curs)  # Запускаем цикл обращения к БД, пока пользователь не ввел команду 'end'
+#     model.close(db_conn, db_curs)  # Закрываем БД

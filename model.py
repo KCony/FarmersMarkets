@@ -393,3 +393,19 @@ def detailed_data(db_curs, name_market):
         found_street.append(db_curs.fetchone())
 
     return found_street
+
+def comments():
+    """Adding a comment to market"""
+    db_conn = sqlite3.connect('server2.db')
+    db_curs = db_conn.cursor()
+
+    id = int(2)
+    comment = 'Хорошее обслуживание'
+
+    db_curs.execute("UPDATE Markets SET Comments = ? where ID = ?", (comment, id))
+
+    db_conn.commit()
+    db_curs.close()
+    db_conn.close()
+
+
