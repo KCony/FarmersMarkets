@@ -410,7 +410,7 @@ def comments():
 
 
 def rating():
-    """Adding a comment to market"""
+    """Adding a rating to market"""
     db_conn = sqlite3.connect('server2.db')
     db_curs = db_conn.cursor()
 
