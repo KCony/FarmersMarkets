@@ -409,3 +409,17 @@ def comments():
     db_conn.close()
 
 
+def rating():
+    """Adding a comment to market"""
+    db_conn = sqlite3.connect('server2.db')
+    db_curs = db_conn.cursor()
+
+    id = int(2)
+    rating = int(5)
+
+    db_curs.execute("UPDATE Markets SET Rating = ? where ID = ?", (rating, id))
+
+    db_conn.commit()
+    db_curs.close()
+    db_conn.close()
+
