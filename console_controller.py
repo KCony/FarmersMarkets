@@ -1,11 +1,10 @@
 """Модуль взаимодействия с пользователем."""
 
-from math import radians, cos, sin, asin, sqrt
 
 import console_ui
 import model
 
-conn, curs = model.init('server2.db')
+conn, curs = model.init('server.db')
 cmd_list = {'list', 'find', 'details', 'show', 'write', 'end'}  # Список доступных команд, оформленный кортежем
 cmd_line = []   # Список из 3-х аргументов, передаваемых в командах list', 'find', 'show', 'write'
 
@@ -53,24 +52,27 @@ def process_command(line2cmd):  # функция валидации команд
         cmd = input(prompt)  # Получаем команду - command
         # p_command_list.append('Troy')
 
-    if line2cmd == 'details': pass  # Пока заглушки
-    if line2cmd == 'show': pass  # Пока заглушки — показать
-    if line2cmd == 'write': pass  # Пока заглушки
+    if line2cmd == 'details':
+        pass  # Пока заглушки
+    if line2cmd == 'show':
+        pass  # Пока заглушки — показать
+    if line2cmd == 'write':
+        pass  # Пока заглушки
 
     return p_command_list  #
 
 
-def execute_command(c_line, db_conn, db_curs):  # функция выполнения команды - c_line
+def execute_command(c_line, db_curs):  # функция выполнения команды - c_line
     # db_conn - подключение к БД (Создаем соединение с нашей базой данных)
     # db_curs - Создаем курсор — это специальный объект который делает запросы и получает их результаты
     # c_line - список из 3-х аргументов -> 1.Команда, 2. Аргумент, 3. Критерий для аргумента.
     # Примеры cmd_line - list city ASC, show review FMID, write review FMID
 
     if c_line[0] == 'list':
-        result = model.list_markets(db_curs, c_line)  # Лезем в БД за списком всех рынков в одном объекте - result
+        result = model.list_markets(db_curs)  # Лезем в БД за списком всех рынков в одном объекте - result
         console_ui.print_ui(c_line, result)   # Здесь обращаемся к модулю console_ui (команда VIEW) для отображения
     if c_line[0] == 'find':
-        result = model.find_market(db_curs, c_line)  # Лезем в БД за списком всех рынков в одном объекте - result
+        result = model.list_markets(db_curs)  # Лезем в БД за списком всех рынков в одном объекте - result
         console_ui.print_ui(c_line, result)  # Здесь обращаемся к модулю console_ui (команда VIEW) для отображения
 
 
@@ -88,7 +90,7 @@ def repl(db_conn, db_curs):
 
 
 def list_market():
-    all_name = model.list_markets(curs, [])
+    all_name = model.list_markets(curs)
     for i in all_name:
         print(i)
 
@@ -99,25 +101,13 @@ def list_city():
         print(i)
 
 
-def distance(La1, La2, Lo1, Lo2):
-
-    # The math module contains the function name "radians" which is used for converting the degrees value into radians.
-    Lo1 = radians(Lo1)
-    Lo2 = radians(Lo2)
-    La1 = radians(La1)
-    La2 = radians(La2)
-
-    # Using the "Haversine formula"
-    D_Lo = Lo2 - Lo1
-    D_La = La2 - La1
-    P = sin(D_La / 2)**2 + cos(La1) * cos(La2) * sin(D_Lo / 2)**2
-
-    Q = 2 * asin(sqrt(P))
-    # The radius of earth in Miles.
-    R_Mi = 3959
-
-    # Then, we will calculate the result
-    return(Q * R_Mi)
+def distance():
+    la1 = input("enter the latitude 1 ==> ")
+    lo1 = input("enter the longitude 1 ==> ")
+    la2 = input("enter the latitude 2 ==> ")
+    lo2 = input("enter the longitude 2 ==> ")
+    dist = model.distance(float(la1), float(lo1), float(la2), float(lo2))
+    print("distance between coordinates ==> {:.2f} miles".format(dist))
 
 
 def name_by_zip(db_curs, zip_code):
@@ -159,8 +149,9 @@ def details(db_curs, name):
 # list_market()
 # list_city()
 # details(curs, "HAPI Fresh Farmers' Market")
-name_by_city(curs, 'Akron', 'Ohio')
+# name_by_city(curs, 'Akron', 'Ohio')
 # name_by_zip(curs, 5828)
+# distance()
 
 model.close(conn, curs)
 
