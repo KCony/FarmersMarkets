@@ -227,7 +227,7 @@ def find_by_zip(db_curs, zip_code):         # Поиск рынка по ZIP-к�
     return name_by_zip
 
 
-def find_by_city(db_curs, city, state):         # Поиск рынка по городу
+def find_by_city(db_curs, city, state):         # Поиск рынка по городу и штату
     """searching name of Market by city and state"""
     xc = []
     db_curs.execute("""SELECT idMarket FROM Addresses WHERE City = 
@@ -273,7 +273,7 @@ def detailed_data(db_curs, name_market):            # Детали о рынке
     return found_street
 
 
-def comments(db_curs, db_conn, comment, id_market):
+def comments(db_curs, db_conn, comment, id_market):     # Добавление комментария в БД
     """Adding a comment to market"""
     db_curs.execute("""UPDATE Markets SET Comments = ? where ID = ?""",
                     (comment, id_market))
@@ -281,7 +281,7 @@ def comments(db_curs, db_conn, comment, id_market):
     db_conn.commit()
 
 
-def rating(db_curs, db_conn, rating_m, id_market):
+def rating(db_curs, db_conn, rating_m, id_market):   # Добавление рейтинга в БД
     """Adding a rating to market"""
     db_curs.execute("""UPDATE Markets SET Rating = ? where ID = ?""",
                     (rating_m, id_market))
@@ -295,6 +295,30 @@ def distance(la1, lo1, la2, lo2):           # расчет дистанции м
     lo2 = radians(lo2)
     la1 = radians(la1)
     la2 = radians(la2)
+
+    d_lo = lo2 - lo1
+    d_la = la2 - la1
+    p = sin(d_la / 2) ** 2 + cos(la1) * cos(la2) * sin(d_lo / 2) ** 2
+
+    q = 2 * asin(sqrt(p))
+
+    result = (q * 3959)
+    return result
+
+
+def dist_btwn_m(db_curs, market1, market2):     # расчет дистанции между рынками
+    """determining the distance between markets"""
+    db_curs.execute("""SELECT LocX, LocY FROM Addresses WHERE
+    idMarket = (SELECT ID FROM Markets WHERE Name = ?)""", (market1, ))
+    mrkt1 = db_curs.fetchone()
+    db_curs.execute("""SELECT LocX, LocY FROM Addresses WHERE
+    idMarket = (SELECT ID FROM Markets WHERE Name = ?)""", (market2, ))
+    mrkt2 = db_curs.fetchone()
+
+    lo1 = radians(float(mrkt1[0]))
+    lo2 = radians(float(mrkt2[0]))
+    la1 = radians(float(mrkt1[1]))
+    la2 = radians(float(mrkt2[1]))
 
     d_lo = lo2 - lo1
     d_la = la2 - la1
