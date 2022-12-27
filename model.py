@@ -13,8 +13,8 @@ from math import radians, cos, sin, asin, sqrt
 def etl(connect, cursor, file_csv):         # Создание базы данных
     """creating table"""
     data = []
-    with open(file_csv, 'r', encoding="utf-8") as f:
-        reader = csv.reader(f)
+    with open(file_csv, 'r', encoding="utf-8") as f_in:
+        reader = csv.reader(f_in)
         for row in reader:
             row_list = []
             for i in row:
@@ -221,7 +221,7 @@ def all_cities(db_curs):            # Список всех городов ры�
 
 def find_by_zip(db_curs, zip_code):         # Поиск рынка по ZIP-коду
     """searching name of Market by ZIP code"""
-    db_curs.execute("""SELECT Name, comments, rating FROM Markets WHERE 
+    db_curs.execute("""SELECT Name, comments, rating FROM Markets WHERE
     ID = (SELECT idMarket FROM Addresses WHERE ZIP = ?)""", (zip_code, ))
     name_by_zip = db_curs.fetchone()
     return name_by_zip
@@ -229,15 +229,15 @@ def find_by_zip(db_curs, zip_code):         # Поиск рынка по ZIP-к�
 
 def find_by_city(db_curs, city, state):         # Поиск рынка по городу и штату
     """searching name of Market by city and state"""
-    xc = []
-    db_curs.execute("""SELECT idMarket FROM Addresses WHERE City = 
-    (SELECT ID FROM Cities WHERE City = ?) AND State = 
+    id_market = []
+    db_curs.execute("""SELECT idMarket FROM Addresses WHERE City =
+    (SELECT ID FROM Cities WHERE City = ?) AND State =
     (SELECT ID FROM States WHERE State = ?)""", (city, state))
     for result in db_curs:
-        xc.append(result)
+        id_market.append(result)
     list_by = []
-    for i in xc:
-        db_curs.execute("""SELECT Name, comments, rating 
+    for i in id_market:
+        db_curs.execute("""SELECT Name, comments, rating
                         FROM Markets WHERE ID = ? """, i)
         list_by.append(db_curs.fetchone())
 
@@ -253,20 +253,20 @@ def detailed_data(db_curs, name_market):            # Детали о рынке
         found_id.append(result)
     found_street = []
     for i in found_id:
-        db_curs.execute(f"""SELECT City FROM Addresses 
+        db_curs.execute(f"""SELECT City FROM Addresses
                         WHERE idMarket = {i[0]}""")
         city = db_curs.fetchone()
-        db_curs.execute(f"""SELECT State FROM Addresses 
+        db_curs.execute(f"""SELECT State FROM Addresses
                         WHERE idMarket = {i[0]}""")
         state = db_curs.fetchone()
-        db_curs.execute(f"""SELECT County FROM Addresses 
+        db_curs.execute(f"""SELECT County FROM Addresses
                         WHERE idMarket = {i[0]}""")
         county = db_curs.fetchone()
 
-        db_curs.execute(f"""SELECT addresses.*, cities.city, states.state, 
-        counties.county, media.* FROM Addresses, Cities, states, counties, 
-        media WHERE addresses.idmarket = {i[0]} and cities.id = {city[0]} 
-        AND states.id = {state[0]} AND counties.id = {county[0]} 
+        db_curs.execute(f"""SELECT addresses.*, cities.city, states.state,
+        counties.county, media.* FROM Addresses, Cities, states, counties,
+        media WHERE addresses.idmarket = {i[0]} and cities.id = {city[0]}
+        AND states.id = {state[0]} AND counties.id = {county[0]}
         AND media.idMarket = {i[0]}""")
         found_street.append(db_curs.fetchone())
 
@@ -298,11 +298,11 @@ def distance(la1, lo1, la2, lo2):           # расчет дистанции м
 
     d_lo = lo2 - lo1
     d_la = la2 - la1
-    p = sin(d_la / 2) ** 2 + cos(la1) * cos(la2) * sin(d_lo / 2) ** 2
+    d_p = sin(d_la / 2) ** 2 + cos(la1) * cos(la2) * sin(d_lo / 2) ** 2
 
-    q = 2 * asin(sqrt(p))
+    d_q = 2 * asin(sqrt(d_p))
 
-    result = (q * 3959)
+    result = (d_q * 3959)
     return result
 
 
@@ -322,11 +322,11 @@ def dist_btwn_m(db_curs, market1, market2):     # расчет дистанци�
 
     d_lo = lo2 - lo1
     d_la = la2 - la1
-    p = sin(d_la / 2) ** 2 + cos(la1) * cos(la2) * sin(d_lo / 2) ** 2
+    d_p = sin(d_la / 2) ** 2 + cos(la1) * cos(la2) * sin(d_lo / 2) ** 2
 
-    q = 2 * asin(sqrt(p))
+    d_q = 2 * asin(sqrt(d_p))
 
-    result = (q * 3959)
+    result = (d_q * 3959)
     return result
 
 
