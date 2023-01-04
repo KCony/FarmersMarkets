@@ -54,8 +54,8 @@ class Model:
         for result in self.db_curs:
             id_market.append(result)
         list_by = []
-        for ID in id_market:
-            self.db_curs.execute("""SELECT Name FROM Markets WHERE ID = ? """, ID)
+        for market in id_market:
+            self.db_curs.execute("""SELECT Name FROM Markets WHERE ID = ? """, market)
             list_by.append(self.db_curs.fetchone())
 
         return list_by
@@ -67,22 +67,22 @@ class Model:
         for result in self.db_curs:
             found_id.append(result)
         found_street = []
-        for ID in found_id:
+        for market in found_id:
             self.db_curs.execute(f"""SELECT City FROM Addresses
-                            WHERE idMarket = {ID[0]}""")
+                            WHERE idMarket = {market[0]}""")
             city = self.db_curs.fetchone()
             self.db_curs.execute(f"""SELECT State FROM Addresses
-                            WHERE idMarket = {ID[0]}""")
+                            WHERE idMarket = {market[0]}""")
             state = self.db_curs.fetchone()
             self.db_curs.execute(f"""SELECT County FROM Addresses
-                            WHERE idMarket = {ID[0]}""")
+                            WHERE idMarket = {market[0]}""")
             county = self.db_curs.fetchone()
 
             self.db_curs.execute(f"""SELECT addresses.*, cities.city, states.state,
             counties.county, media.* FROM Addresses, Cities, states, counties,
-            media WHERE addresses.idmarket = {ID[0]} and cities.id = {city[0]}
+            media WHERE addresses.idmarket = {market[0]} and cities.id = {city[0]}
             AND states.id = {state[0]} AND counties.id = {county[0]}
-            AND media.idMarket = {ID[0]}""")
+            AND media.idMarket = {market[0]}""")
             found_street.append(self.db_curs.fetchone())
 
         return found_street
@@ -105,22 +105,20 @@ class Model:
         self.db_curs.execute("""SELECT LocX, LocY FROM Addresses WHERE
         idMarket = (SELECT ID FROM Markets WHERE Name = ?)""", (market2, ))
         mrkt2 = self.db_curs.fetchone()
-
-        lo1 = radians(float(mrkt1[0]))
-        lo2 = radians(float(mrkt2[0]))
-        la1 = radians(float(mrkt1[1]))
-        la2 = radians(float(mrkt2[1]))
-
-        d_lo = lo2 - lo1
-        d_la = la2 - la1
-        d_p = sin(d_la / 2) ** 2 + cos(la1) * cos(la2) * sin(d_lo / 2) ** 2
+        lon1 = radians(float(mrkt1[0]))
+        lon2 = radians(float(mrkt2[0]))
+        lat1 = radians(float(mrkt1[1]))
+        lat2 = radians(float(mrkt2[1]))
+        d_lo = lon2 - lon1
+        d_la = lat2 - lat1
+        d_p = sin(d_la / 2) ** 2 + cos(lat1) * cos(lat2) * sin(d_lo / 2) ** 2
         result = ((2 * asin(sqrt(d_p))) * 3959)
         return result
 
-    def comm_market(self, idmarket):         # коммнтарии магазина
+    def comm_market(self, id_market):         # коммнтарии магазина
         """add comments about the market"""
         cmnts = []
-        self.db_curs.execute("""SELECT Comment FROM Comments WHERE idMarket = ?""", (idmarket, ))
+        self.db_curs.execute("""SELECT Comment FROM Comments WHERE idMarket = ?""", (id_market,))
         for comment in self.db_curs:
             cmnts.append(comment)
         return cmnts
