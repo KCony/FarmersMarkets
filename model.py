@@ -9,7 +9,7 @@ import csv
 from math import radians, cos, sin, asin, sqrt
 
 
-# BLOCK #1 ETL
+# region BLOCK #1 ETL
 def etl(connect, cursor, file_csv):         # Создание базы данных
     """creating table"""
     data = []
@@ -151,7 +151,8 @@ def etl(connect, cursor, file_csv):         # Создание базы данн
     connect.commit()
 
 
-def insert_ccs(connect, cursor):
+def insert_city(connect, cursor):
+    """inserting cities in table"""
     cursor.execute("""SELECT City FROM Marketscsv""")
     city_from_csv = cursor.fetchall()
     cursor.execute("SELECT * FROM Cities")
@@ -165,7 +166,11 @@ def insert_ccs(connect, cursor):
     for i in in_t1:
         cursor.execute("""UPDATE Addresses SET City = ? WHERE rowid = ?""", (i, rowid1))
         rowid1 += 1
+    connect.commit()
 
+
+def insert_county(connect, cursor):
+    """inserting counties in table"""
     cursor.execute("""SELECT county FROM Marketscsv""")
     county_from_csv = cursor.fetchall()
     cursor.execute("SELECT * FROM Counties")
@@ -179,7 +184,11 @@ def insert_ccs(connect, cursor):
     for i in in_t2:
         cursor.execute("""UPDATE Addresses SET County = ? WHERE rowid = ?""", (i, rowid2))
         rowid2 += 1
+    connect.commit()
 
+
+def insert_state(connect, cursor):
+    """inserting states in table"""
     cursor.execute("""SELECT state FROM Marketscsv""")
     state_from_csv = cursor.fetchall()
     cursor.execute("SELECT * FROM States")
@@ -193,11 +202,13 @@ def insert_ccs(connect, cursor):
     for i in in_t3:
         cursor.execute("""UPDATE Addresses SET State = ? WHERE rowid = ?""", (i, rowid3))
         rowid3 += 1
-
     connect.commit()
 
 
-# BLOCK #2 Model
+# endregion
+# region BLOCK #2 Model
+
+
 def init(f_name):            # Подключение к базе данных
     """init"""
     db_conn = sqlite3.connect(f_name)
@@ -346,18 +357,23 @@ def rating_market(db_curs, idmarket):         # средний рейтинг м
     for i in db_curs:
         ratings.append(i)
     return ratings
+# endregion
 
 
 if __name__ == '__main__':
     try:
         file_db = input("specify DB name and dir ==> ")
-        conn, curs = init('server.db')
+        conn, curs = init(file_db)
         file_name = input("specify CSV filename and dir ==> ")
         etl(conn, curs, file_name)
-        insert_ccs(conn, curs)
+        insert_city(conn, curs)
+        insert_county(conn, curs)
+        insert_state(conn, curs)
         close(conn, curs)
         print("THE DataBase is ready")
     except PermissionError:
         print("Something went wrong, check CSV file")
     except FileNotFoundError:
         print("Something went wrong, check CSV file")
+    except sqlite3.IntegrityError:
+        print("Problems with Data Base. Maybe Data Base is already exist")
