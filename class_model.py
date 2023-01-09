@@ -24,10 +24,10 @@ class Model:
     def list_markets(self):          # Список всех рынков
         """select all name of market"""
         markets_list = []
-        self.db_curs.execute("SELECT Name FROM Markets")
+        self.db_curs.execute("SELECT Name, ID FROM Markets")
 
         for result in self.db_curs:
-            markets_list.append(result[0])
+            markets_list.append(f"{result[1]} - {result[0]}")
         return markets_list
 
     def all_cities(self):            # Список всех городов рынков

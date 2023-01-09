@@ -225,10 +225,9 @@ def close(db_conn, db_curs):            # Закрытие базы данных
 def list_markets(db_curs):          # Список всех рынков
     """select all name of market"""
     markets_list = []
-    db_curs.execute("SELECT Name FROM Markets")
-
+    db_curs.execute("SELECT Name, ID FROM Markets")
     for result in db_curs:
-        markets_list.append(result[0])
+        markets_list.append(result)
     return markets_list
 
 
@@ -323,10 +322,10 @@ def distance(la1, lo1, la2, lo2):           # расчет дистанции м
 def dist_btwn_m(db_curs, market1, market2):     # расчет дистанции между рынками
     """determining the distance between markets"""
     db_curs.execute("""SELECT LocX, LocY FROM Addresses WHERE
-    idMarket = (SELECT ID FROM Markets WHERE Name = ?)""", (market1, ))
+    idMarket = ?""", (market1, ))
     mrkt1 = db_curs.fetchone()
     db_curs.execute("""SELECT LocX, LocY FROM Addresses WHERE
-    idMarket = (SELECT ID FROM Markets WHERE Name = ?)""", (market2, ))
+    idMarket = ?""", (market2, ))
     mrkt2 = db_curs.fetchone()
 
     lo1 = radians(float(mrkt1[0]))
