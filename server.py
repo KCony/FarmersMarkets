@@ -74,7 +74,18 @@ class Database:
                 return True  # Возвращаем True
         except FileNotFoundError:  # Если ошибка
             return False  # Возвращаем False
+            
+    def return_frame(self):
+        """
+        Возвращаем все данные
+        """
+        return self.data
 
+    def return_headers(self):
+        """
+        Возвращаем заголовки
+        """
+        return self.data[0].keys()
 
 if __name__ == '__main__':
     # with open(Database.filename, 'r', encoding="utf-8") as file:
