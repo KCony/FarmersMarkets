@@ -88,6 +88,6 @@ class Viewer:
         print(res_list)
 
 
-s = ShowMainMenu()
-s.menu_display()
-s.chooser()
+show_main = ShowMainMenu()
+show_main.menu_display()
+show_main.chooser()
