@@ -86,23 +86,41 @@ class Database:
         Возвращаем заголовки
         """
         return self.data[0].keys()
+        
+    def market_show_info(self, market_position: int):                # Функция вывода полной информации о рынке. 
+        '''Метод возвращает подробную информацию о рынке, находящююся
+           в базе данных в виде словаря. Обратиться к записи можно через её
+           порядковый номер.
+           Пример использования:
+           market = market_show_info(5) - обращение к рынку под пятым номером.'''
+        # Предполагается, что у названий рынков, независимо от способа их вывода в консоль (всё разом, или постранично)
+        # будет нумерация от 1 и до конца списка.
+        if market_position == 0 or market_position > int(len(self.data)):  # Если введённое число равно 0 или больше размера базы
+            return False                                              # Выводим ошибку
+        else:                                                         # Иначе
+            market_position -= 1        # Вычисляем реальный размер позиции (начало нумерации позиций в базе начинается с 0)
+            return self.data[market_position]
+
+
+
 
 if __name__ == '__main__':
-    # with open(Database.filename, 'r', encoding="utf-8") as file:
-    #    reader = csv.DictReader(file)
-    #    database = Database()
-    #    for i in database.show_filtered_markets_city_state(reader, 'Highlands', 'New Jersey'):
-    #        print(i.get('MarketName'))
+    sheet_number = 1           # Номер просматриваемой страницы
+    row_count = 1              # Счётчик строк
     database = Database()
     if database.open_database('Export.csv'):
         print("База данных открыта успешно.")
-        print("Выполняем поиск по городу и штату:")
-        for i in database.show_filtered_markets_city_state(database.data, 'Highlands', 'New Jersey'):
-            print(i.get('MarketName'))
-        print("Выводим содержимое пятой страницы:")
-        sheet = database.show_sheet(5)
-        for i in sheet:
-            print(i)
+        #print("Выполняем поиск по городу и штату:")
+        #for i in database.show_filtered_markets_city_state(database.data, 'Highlands', 'New Jersey'):
+        #    print(i.get('MarketName'))
+        print("Содержимое страницы " + str(sheet_number))
+        sheet = database.show_sheet(sheet_number)
+        for i in sheet:                                         # Цикл, где мы считываем исключительно названия рынков
+            print(str(row_count) + '. ' + i['MarketName'])      # Выводим названия рынков с нумерацией
+            row_count += 1
+        pointer = int(input("Введите номер строки: "))          # Предлагаем пользователю получить более подробную информацию
+        market = database.market_show_info(pointer)             # Считываем словарь
+        print(market)                                           # Выводим его в консоль
     else:
         print("Базу данных открыть не удалось.")
 
