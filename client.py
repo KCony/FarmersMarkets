@@ -30,12 +30,11 @@ class ShowMainMenu:
             print("pass")
 
         elif cmd == "2":
-            city = "Highlands"  # input("Введите город: ")
-            state = "New Jersey"  # input("Введите штат: ")
+            city =  input("Введите город: ")
+            state =  input("Введите штат: ")
             self.show_list = self.database.show_filtered_markets_city_state(self.database.data, city, state)
             viewer = Viewer(self)
             viewer.show_city_state()
-            print(self.show_list)
         elif cmd == "3":
             print("Empty")
 
