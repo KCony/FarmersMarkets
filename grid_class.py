@@ -1,12 +1,10 @@
 import itertools as itr
+import math
 
 
-class grid_search:
-
-    '''Конструктор'''
-
+class GridSearch:
     def __init__(self, file_data) -> None:
-        self.radius = 3
+        self.radius = 30
         self.grid_borders = {}
         self.filled_map = {}
         self.every_dot = []
@@ -16,217 +14,119 @@ class grid_search:
         self.closest_points = {}
 
         self.file_data = file_data
-        # в классе храним информацию о сетке по которой ее можно будет запросить и воспроизвести
-        # все точки на плоскости(комбинации), список рассортированных 
 
 
-    '''Сортировка и работа с данными'''
-
-    def content_list(self, dict):
-        '''
-        Преобразование  и сортировка данных
-        '''
+    def content_list(self, data):
         coord = {}
-        for row in dict:
-            key = row['FMID']
-            columns = ['x', 'y']
-            for n in columns:
-                if row[n]!='':
-                    if key not in coord:
-                        coord[key] = []
-                    coord[key].append(float(row[n]))
+        for row in data:
+            for n in ['x', 'y']:
+                if row[n]:
+                    coord.setdefault(row['FMID'], []).append(float(row[n]))
         return coord
 
+
     def min_max(self, coord):
-        '''
-        Sort and display the _minimum and _maximum of the specified dictionary based on data base
-        '''
-        x_val = []
-        for x, y in coord.values():
-            x_val.append(x)
-        y_val = []
-        for x, y in coord.values():
-            y_val.append(y)
-
-        x_val = sorted(x_val)
-        y_val = sorted(y_val)
-
-        x_min_max = x_val[0], x_val[-1]
-        y_min_max = y_val[0], y_val[-1]
-
-        return x_min_max, y_min_max
-    
-
-    '''Подготовка к построению сетки'''
-
+        x_val, y_val = zip(*coord.values())
+        return (min(x_val), max(x_val)), (min(y_val), max(y_val))
 
     def period_and_1square_points(self, points):
         return len(points), [0, 1, len(points), len(points)+1]
-    
 
-    def divide_into_parts(self, coord__min, coord__max):
-        '''
-        Divide x and y lines by equal parts. Takes _minimum and _maximum x or y value as args
-        '''
-        temp_list = []
-        tenth = (coord__max - coord__min) / 7
-        def counter(list, coord__min, coord__max):
-            while coord__max > coord__min:
-                coord = coord__min + tenth
-                list.append(coord)
-                coord__min = coord  # исправлено: обновляем начальное значение для следующей итерации
-        counter(temp_list, coord__min, coord__max)
-        return [coord__min] + temp_list
-
+    def divide_into_parts(self, coord_min, coord_max, parts=7):
+        tenth = (coord_max - coord_min) / parts
+        return [coord_min + i * tenth for i in range(parts + 1)]
 
     def combine(self, x_list, y_list):
-        '''
-        Combinations of points for grid building
-        '''
-        comb = list(itr.product(x_list, y_list))
-        return comb
+        return list(itr.product(x_list, y_list))
 
-
-    '''Стройка'''
 
     def build_grid(self, combinations, first_sq_points, row_len):
-        '''
-        Form squares. Takes combinations of points as arg
-        '''
         grid = {}
         c = 1
+
         def filler(sq_name, points, c):
             try:
                 fin_point = combinations[points[0]], combinations[points[3]]
+                grid.setdefault(sq_name, []).extend(fin_point)
 
-                if sq_name not in grid:
-                    grid[sq_name] = []
-
-                for i in fin_point:
-                    grid[sq_name].append(i)
-
-                # Условие выхода из рекурсии: если следующий индекс выходит за пределы
-                if points[3] + 1 >= len(combinations):
-                    return
-
-                # Рекурсивный вызов с новыми значениями
-                new_sq_name = 'square' + str(c)
-                new_points = [i + 1 for i in points]
-                filler(new_sq_name, new_points, c+1)
+                if points[3] + 1 < len(combinations):
+                    new_sq_name = 'square' + str(c)
+                    new_points = [i + 1 for i in points]
+                    filler(new_sq_name, new_points, c + 1)
             except IndexError:
-                # Если мы вышли за пределы списка, выходим из рекурсии
-                return
-        # Начальные значения для первого вызова
+                pass
+
         filler('square0', first_sq_points, c)
 
-        del_indx = len(grid)                                             # костыль.... убираем лишние квадраты
-        del_list = []
-        for _ in range(0, row_len):
-            del_indx -= row_len
-            del_list.append(del_indx)
-
+        del_list = [i for i in range(row_len, len(grid), row_len)]
         for i in del_list:
-            if i>0:
-                del grid['square'+str(i)]
-
+            del grid['square' + str(i)]
 
         return grid
 
-    '''ПРЕДВАРИТЕЛЬНЫЙ ПОИСК'''
 
-    '''Делим сетку пополам'''
-
-    def div_half(self, combinations):   
+    def split_in_half(self, combinations):
         if len(combinations)%2==0:
             x = len(combinations)//2
-            first_half, second_half = combinations[:x], combinations[x:]
-
-        first_half = first_half[0], first_half[-1]
-        second_half = second_half[0], second_half[-1]
-
-        return first_half, second_half
+            first_half = combinations[:x][0],  combinations[:x][-1]
+            second_half = combinations[x:][0],  combinations[x:][-1]
+            return first_half, second_half
 
 
-    '''Принадлежность точки к области'''
-
-    def is_in(self, point, square):
+    def is_point_inside(self, point, square):
         try:
             _min, _max = square[0], square[1]
             x, y = point[0], point[1]
-            # print(x, y)
-            if _min[0]<=x and _max[0]>=x and _min[1]<=y and _max[1]>=y:
+            if _min[0] <= x <= _max[0] and _min[1] <= y <= _max[1]:
                 return x, y
         except IndexError:
             pass
-
-    '''Заполнение сетки'''
 
     def fill_grid(self, content, grid):
         filled_grid = {}
         for key, value in grid.items():
             for id, point in content.items():
-                # print('point', point)
-                # print('value', value)
-                point_pos = self.is_in(point, value)
+                point_pos = self.is_point_inside(point, value)
                 if point_pos:
-                    if key not in filled_grid:
-                        filled_grid[key] = []
-                    point_id = point_pos, id
-                    filled_grid[key].append(point_id)
+                    filled_grid.setdefault(key, []).append((point_pos, id))
         return filled_grid
 
 
-    '''Поисковики'''
 
-    def find_neibours(self, sq_name, period_and_1square_points):
+    def find_neighbours(self, sq_name, period_and_1square_points):
         square_number = int(sq_name.replace('square', ''))
         x = period_and_1square_points-1
-        neibour_indx = [
-            (square_number - x + 1), (square_number + 1), (square_number + x + 1),
-            (square_number - x), square_number, (square_number + x),
-            (square_number - x - 1), (square_number - 1), (square_number + x - 1)
+        neighbour_indx = [
+            square_number - x + 1, square_number + 1, square_number + x + 1,
+            square_number - x, square_number, square_number + x,
+            square_number - x - 1, square_number - 1, square_number + x - 1
         ]
 
-        neibours = ['square'+str(i) for i in neibour_indx if i>=0]
-
+        neibours = ['square'+str(i) for i in neighbour_indx if i>=0]
         return neibours
 
     def half_search(self, user):
-        '''
-        Сужаем поиск до половины
-        
-        '''
-        first_half, second_half = self.div_half(self.every_dot)
-        half = len(self.filled_map)//2
-        if self.is_in(user, first_half):
+        first_half, second_half = self.split_in_half(self.every_dot)
+        half = len(self.filled_map) // 2
+
+        if self.is_point_inside(user, first_half):
             search_field = dict(list(self.grid_borders.items())[:half])
-            # print(search_field, self.grid_borders)
             for key, value in search_field.items():
-                if self.is_in(user, value):
+                if self.is_point_inside(user, value):
                     self.user_square = key
-
-
-            print(f'User position found in the first half,  {self.user_square}')
-        elif self.is_in(user, second_half):
+                    print(f'User position found in the first half, {self.user_square}')
+        elif self.is_point_inside(user, second_half):
             search_field = dict(list(self.grid_borders.items())[half:])
-            # print(search_field, self.grid_borders)
             for key, value in search_field.items():
-                if self.is_in(user, value):
+                if self.is_point_inside(user, value):
                     self.user_square = key
-
-            print(f'User position found in the second half,  {self.user_square}')
+                    print(f'User position found in the second half, {self.user_square}')
         else:
             raise ValueError('User position is out of range!\nPlease, try again.')
         return self.user_square
 
     def radius_search(self, user):
-        '''
-        Финальный поиск по радиусу
-        
-        '''
-        square_range = self.find_neibours(self.user_square, self.period_len)
-        # print(square_range)
-
+        square_range = self.find_neighbours(self.user_square, self.period_len)
         position_list = {}
 
         for square in square_range:
@@ -236,24 +136,21 @@ class grid_search:
                 for dot in dots_list:
                     dot_id = dot[1]
                     dot_coord = dot[0]
-                    distance = sum((vp - lp) ** 2 for vp, lp in zip(dot_coord, user)) ** 0.5
+                    x_1, x_2, y_1, y_2 = map(math.radians, [user[0], dot_coord[0], user[1], dot_coord[1]])
 
-                    if round(distance, 2)<=self.radius:
+                    a = (math.sin((x_2 - x_1) / 2)) ** 2 + math.cos(x_1)
+                    b = a * math.cos(x_2) * (math.sin((y_2 - y_1) / 2)) ** 2
+                    distance = 2 * 3958.8 * math.asin(math.sqrt(b))
+
+                    if round(distance, 2) <= self.radius:
                         position_list[dot_id] = dot_coord, round(distance, 2)
             except KeyError:
                 pass
         self.closest_points = dict(sorted(position_list.items(), key=lambda val: val[1][1]))
-
         return self.closest_points
 
 
-    '''Вызывающие функции'''
-
     def map_builder(self):
-        '''
-        Строит сетку
-        
-        '''
         coord = self.content_list(self.file_data)
         x_min_max, y_min_max = self.min_max(coord)
         border_x = self.divide_into_parts(*x_min_max)
@@ -261,55 +158,51 @@ class grid_search:
         self.every_dot = self.combine(border_x, border_y)
         self.period_len, self.first_square_coords = self.period_and_1square_points(border_x)
         self.grid_borders = self.build_grid(self.every_dot, self.first_square_coords, self.period_len)
-        self.filled_map = self.fill_grid(coord, self.grid_borders)  
+        self.filled_map = self.fill_grid(coord, self.grid_borders)
         print('Сетка успешно построена!')
         return self.every_dot, self.period_len, self.first_square_coords, self.filled_map, self.grid_borders
 
-
     def search(self, user):
-        '''
-        Поиск по готовой сетке
-        '''
         self.user_square = self.half_search(user)
-        self.closet_points = self.radius_search(user)
+        self.closest_points = self.radius_search(user)
         return self.closest_points
-
 
 
 if __name__ == '__main__':
     import server
-    # from memory_profiler import memory_usage
     import time
 
     db = server.Database()
     db.open_database('Export.csv')
     file = db.data
-    user = (-72.140337, 44.411036)
-    srch = grid_search(file)
-
+    srch = GridSearch(file)
     start_time = time.time()  # Таймер1 старт
     srch.map_builder()
-
     end_time = time.time()
-    execution_time = end_time - start_time                                  
-    
+    execution_time = end_time - start_time
     print(f"Время создания сетки: {execution_time} секунд")
 
-    start_time = time.time()
+    while True:
 
-    res = srch.search(user)
-    chk = 0
-    for index, coordinates in res.items():                                          # Вывод результата на консоль
-        if coordinates[0]:
-            x = coordinates[0][0]
-            y = coordinates[0][1]
-            dist = coordinates[1]
-            print(f'{chk:<5} Индекс: {index} x: {x:<5}  y: {y:<5} Расстояние: {dist:<5} миль')
-            chk +=1
+        inp = input('for exit press 0, for search press 1\n')
+        match inp:
+            case '0':
+                break
+            case '1':
+                user_pos = float(input('Enter X coord\n')), float(input('Enter Y coord\n1'))
 
-    end_time = time.time()
-    execution_time = end_time - start_time 
- 
-    print(f"Время перебора по сетке: {execution_time} секунд")    
+                start_time = time.time()
+                res = srch.search(user_pos)
+                chk = 0
+                for index, coordinates in res.items():
+                    if coordinates[0]:
+                        x = coordinates[0][0]
+                        y = coordinates[0][1]
+                        dist = coordinates[1]
+                        print(f'{chk:<5} Индекс: {index} x: {x:<5}  y: {y:<5} Расстояние: {dist:<5} миль')
+                        chk +=1
 
-    # print(f'Memory usage: {memory_usage()}')
+                end_time = time.time()
+                execution_time = end_time - start_time
+
+                print(f"Время перебора по сетке: {execution_time} секунд")
