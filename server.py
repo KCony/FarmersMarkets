@@ -4,7 +4,6 @@ import grid_class
 
 
 class Database:
-    # filename = 'Export.csv'
 
     def __init__(self):
         self.sheet = {}  # Атрибут для хранения содержимого страницы (метод show_sheet)
@@ -31,24 +30,22 @@ class Database:
         result_generator = filter(filter_function, list_reader)
         return list(result_generator)
 
-    def show_filtered_markets_city_state(self, list_reader, city, state):
+    def show_filtered_markets_city_state(self, city, state):
         """
         Метод фильтрует данные таблицы по заданному city и state
-        :param list_reader: принимает объет DictReader, когда у класса будет атрибут DictReader этот параметр надо будет
-                            убрать!
         :param city: задает значение столбца city
         :param state: задает значение столбца state
         :return: list отфильтрованных данных
         """
-        filtered_markets_state = self.show_filtered(list_reader, ('State', state))
+        filtered_markets_state = self.show_filtered(self.data, ('State', state))
         filtered_markets_city_state = self.show_filtered(filtered_markets_state, ('city', city))
         return list(filtered_markets_city_state)
 
-    def show_filtered_markets_city_state_xy(self, list_reader, city, state, distance, zip_code=''):
+    def show_filtered_markets_city_state_xy(self, city, state, distance, zip_code=''):
         """
         Метод фильтрует данные таблицы по заданному city и state, если нет zip_code, если zip_code есть - ищет
-        координаты, по ним находит магазины со значением distance <= заданному в функции
-        :param list_reader: пока принимает объет DictReader
+        координаты(координаты пока что магазина по файлу Export.csv), по ним находит магазины со значением distance <=
+        заданному в функции
         :param city: задает значение столбца city
         :param state: задает значение столбца state
         :param distance: задает расстояние до выбранного пользователем магазина
@@ -56,13 +53,12 @@ class Database:
         :return: list отфильтрованных данных
         """
         if zip_code == '':
-            filtered_city_state = self.show_filtered_markets_city_state(list_reader, city, state)
+            filtered_city_state = self.show_filtered_markets_city_state(city, state)
             return filtered_city_state
         else:
-            filtered_zip = self.show_filtered(list_reader, ('zip', zip_code))
-            print((filtered_zip[0].get('x'), filtered_zip[0].get('y')))
+            filtered_zip = self.show_filtered(self.data, ('zip', zip_code))
             coord = (float(filtered_zip[0].get('x')), float(filtered_zip[0].get('y')))
-            srch = grid_class.grid_search(list_reader)
+            srch = grid_class.grid_search(self.data)
             srch.map_builder()
             res = srch.search(coord)
 
@@ -72,21 +68,20 @@ class Database:
                 if dist <= distance:
                     return True
 
-            def filter_function_markets(dictionary):
-                filter_func_dist = list(filter(filter_function_dist, res.items()))
+            filter_func_dist = list(filter(filter_function_dist, res.items()))
 
+            def filter_function_markets(dictionary):
                 id_list = []
-                for i in filter_func_dist:
-                    ident, coord_dist = i
+                for _ in filter_func_dist:
+                    ident, coord_dist = _
                     id_list.append(ident)
 
                 if dictionary.get('FMID') in id_list:
                     return True
 
-            result_generator = filter(filter_function_markets, list_reader)
+            result_generator = filter(filter_function_markets, self.data)
 
             return list(result_generator)
-
 
     def show_sheet(self, sheet_number):
         """
@@ -156,7 +151,7 @@ if __name__ == '__main__':
     if database.open_database('Export.csv'):
         print("База данных открыта успешно.")
         # print("Выполняем поиск по городу и штату:")
-        # for i in database.show_filtered_markets_city_state(database.data, 'Highlands', 'New Jersey'):
+        # for i in database.show_filtered_markets_city_state('Highlands', 'New Jersey'):
         #    print(i.get('MarketName'))
         print("Содержимое страницы " + str(sheet_number))
         sheet = database.show_sheet(sheet_number)
@@ -166,9 +161,6 @@ if __name__ == '__main__':
         pointer = int(input("Введите номер строки: "))  # Предлагаем пользователю получить более подробную информацию
         market = database.market_show_info(pointer)  # Считываем словарь
         print(market)  # Выводим его в консоль
-        print(database.show_filtered_markets_city_state_xy(database.data, 'Danville', 'Vermont', 0.5, '05828'))
+        print(database.show_filtered_markets_city_state_xy('Danville', 'Vermont', 0.5, '05828'))
     else:
         print("Базу данных открыть не удалось.")
-
-
-

@@ -30,9 +30,9 @@ class ShowMainMenu:
             print("pass")
 
         elif cmd == "2":
-            city =  input("Введите город: ")
-            state =  input("Введите штат: ")
-            self.show_list = self.database.show_filtered_markets_city_state(self.database.data, city, state)
+            city = input("Введите город: ")
+            state = input("Введите штат: ")
+            self.show_list = self.database.show_filtered_markets_city_state(city, state)
             viewer = Viewer(self)
             viewer.show_city_state()
         elif cmd == "3":
@@ -45,20 +45,20 @@ class ShowMainMenu:
             print("Sample: Вы ввели неправильное значение")
 
 
-
 class Viewer:
 
-     def __init__(self, showmainmenu):
-         self.show = showmainmenu
+    def __init__(self, showmainmenu):
+        self.show = showmainmenu
 
-     def show_city_state(self):
-         res_list = []
-         for i, n in enumerate(self.show.show_list):
-             li = dict(n).get("MarketName")
-             res_list.append(li)
-         print(res_list)
+    def show_city_state(self):
+        res_list = []
+        for i, n in enumerate(self.show.show_list):
+            li = dict(n).get("MarketName")
+            res_list.append(li)
+        print(res_list)
+
 
 if __name__ == '__main__':
- show_main = ShowMainMenu()
- show_main.menu_display()
- show_main.chooser()
+    show_main = ShowMainMenu()
+    show_main.menu_display()
+    show_main.chooser()
