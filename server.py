@@ -41,7 +41,7 @@ class Database:
         filtered_markets_city_state = self.show_filtered(filtered_markets_state, ('city', city))
         return list(filtered_markets_city_state)
 
-    def show_filtered_markets_city_state_xy(self, city, state, distance, zip_code=''):
+    def show_filtered_markets_city_state_xy(self, city, state, zip_code='', distance=0.0):
         """
         Метод фильтрует данные таблицы по заданному city и state, если нет zip_code, если zip_code есть - ищет
         координаты(координаты пока что магазина по файлу Export.csv), по ним находит магазины со значением distance <=
@@ -58,9 +58,11 @@ class Database:
         else:
             filtered_zip = self.show_filtered(self.data, ('zip', zip_code))
             coord = (float(filtered_zip[0].get('x')), float(filtered_zip[0].get('y')))
-            srch = grid_class.grid_search(self.data)
+            print(coord)
+            srch = grid_class.GridSearch(self.data)
             srch.map_builder()
             res = srch.search(coord)
+            print(res)
 
             def filter_function_dist(pair):
                 key, value = pair
@@ -161,6 +163,6 @@ if __name__ == '__main__':
         pointer = int(input("Введите номер строки: "))  # Предлагаем пользователю получить более подробную информацию
         market = database.market_show_info(pointer)  # Считываем словарь
         print(market)  # Выводим его в консоль
-        print(database.show_filtered_markets_city_state_xy('Danville', 'Vermont', 0.5, '05828'))
+        print(database.show_filtered_markets_city_state_xy('Danville', 'Vermont', '05828'))
     else:
         print("Базу данных открыть не удалось.")
