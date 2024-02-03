@@ -145,6 +145,28 @@ class Database:
             market_position -= 1  # Вычисляем реальный размер позиции (начало нумерации позиций в базе начинается с 0)
             return self.data[market_position]
 
+    def market_sorting(self, search_parameter, sorting_parameter): # Сортировка фермерских хозяйств по выбранному критерию
+        '''
+        Функция принимает в качестве параметра некий критерий рынка (город, штат, рейтинг и т.д.),
+        после чего производит сортировку по возрастанию, и наоборот (в зависимости от параметра сортировки).
+        :param search_parameter: критерий, относительно которого будет осуществлена сортировка.
+        :param sorting_parameter: параметр сортировки (max - по возрастанию, min - по убыванию).
+        :return: список, содержащий в себе отсортированные по критерию рынки.
+        '''
+
+        # Для сортировки мы используем функцию sorted() стандартной библиотеки
+        # Лямбда-функция существует для удобства: в неё передаётся словарь из списка, в котором мы ищем значение по ключу
+        # search_parameter. При помощи reverse мы устанавливаем порядок сортировки.
+        # Если reverse равняется true (в данном случае - выполняется условие совпадение с параметра со строкой 'min'),
+        # то будет выполнена сортировка по убыванию. В противном случае - по возрастанию (при передаче параметра max).
+        # Если в функцию были переданые неверные параметры, она вернёт Значение False.
+        # При успешном выполнении будет возвращёна копия списка, но уже отсортированная
+        try:
+            self.sorted_data = sorted(self.data, key=lambda x: x[search_parameter], reverse=(sorting_parameter == 'min'))
+            return self.sorted_data
+        except:
+            return False
+
 
 if __name__ == '__main__':
     sheet_number = 1  # Номер просматриваемой страницы
@@ -155,14 +177,19 @@ if __name__ == '__main__':
         # print("Выполняем поиск по городу и штату:")
         # for i in database.show_filtered_markets_city_state('Highlands', 'New Jersey'):
         #    print(i.get('MarketName'))
-        print("Содержимое страницы " + str(sheet_number))
-        sheet = database.show_sheet(sheet_number)
-        for i in sheet:  # Цикл, где мы считываем исключительно названия рынков
-            print(str(row_count) + '. ' + i['MarketName'])  # Выводим названия рынков с нумерацией
-            row_count += 1
-        pointer = int(input("Введите номер строки: "))  # Предлагаем пользователю получить более подробную информацию
-        market = database.market_show_info(pointer)  # Считываем словарь
-        print(market)  # Выводим его в консоль
-        print(database.show_filtered_markets_city_state_xy('Danville', 'Vermont', '05828'))
+        #print("Содержимое страницы " + str(sheet_number))
+        #sheet = database.show_sheet(sheet_number)
+        #for i in sheet:  # Цикл, где мы считываем исключительно названия рынков
+        #    print(str(row_count) + '. ' + i['MarketName'])  # Выводим названия рынков с нумерацией
+        #    row_count += 1
+        #pointer = int(input("Введите номер строки: "))  # Предлагаем пользователю получить более подробную информацию
+        #market = database.market_show_info(pointer)  # Считываем словарь
+        #print(market)  # Выводим его в консоль
+        #print(database.show_filtered_markets_city_state_xy('Danville', 'Vermont', '05828'))
+        sorted_markets = database.market_sorting('County','max') # Сортируем рынки по критерию "Округ"
+        # Выведем первые 60 рынков для проверки сортировки (только содержимое поля "Округ"
+        for i in range(60):
+            x = sorted_markets[i]
+            print(x["County"])
     else:
         print("Базу данных открыть не удалось.")
